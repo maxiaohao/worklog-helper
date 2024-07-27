@@ -1,0 +1,15 @@
+*.diff
+*.exe
+*.iml
+*.log
+*.out
+*.patch
+*.swp
+*~
+.DS_Store
+.coverage/
+.idea/
+.vimrc
+.vscode/
+.~*
+bin
