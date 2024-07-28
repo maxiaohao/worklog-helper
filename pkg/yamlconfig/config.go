@@ -10,13 +10,17 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func Read(config *any, subDirName string) error {
+func Read(config any, subDirName string) error {
 	configDir, err := getConfigDir()
 	if err != nil {
 		return err
 	}
 
-	configFilePath := filepath.Join(configDir, subDirName, "config.yaml")
+	configSubDirPath := filepath.Join(configDir, subDirName)
+	os.MkdirAll(configSubDirPath, os.ModePerm)
+
+	configFilePath := filepath.Join(configSubDirPath, "config.yaml")
+
 	file, err := os.Open(configFilePath)
 	if err != nil {
 		return err
@@ -28,20 +32,23 @@ func Read(config *any, subDirName string) error {
 		return err
 	}
 
-	if err := yaml.Unmarshal(yamlData, &config); err != nil {
+	if err := yaml.Unmarshal(yamlData, config); err != nil {
 		return fmt.Errorf("failed to unmarshal YAML: %w", err)
 	}
 	return nil
 }
 
-func Write(subDirName string, config *any) {
+func Write(subDirName string, config any) {
 	configDir, err := getConfigDir()
 	if err != nil {
 		fmt.Printf("Error determining config directory: %v\n", err)
 		return
 	}
 
-	configFilePath := filepath.Join(configDir, subDirName, "config.yaml")
+	configSubDirPath := filepath.Join(configDir, subDirName)
+	os.MkdirAll(configSubDirPath, os.ModePerm)
+
+	configFilePath := filepath.Join(configSubDirPath, "config.yaml")
 
 	file, err := os.Create(configFilePath)
 	if err != nil {
@@ -53,12 +60,18 @@ func Write(subDirName string, config *any) {
 	encoder := yaml.NewEncoder(file)
 	defer encoder.Close()
 
-	err = encoder.Encode(*config)
+	err = encoder.Encode(config)
 	if err != nil {
 		fmt.Printf("Error encoding config content: %v\n", err)
 	} else {
 		fmt.Printf("Config saved successfully to %s.\n", configFilePath)
 	}
+}
+
+func GetConfigFilePath(subDirName string) string {
+	configDir, _ := getConfigDir()
+	configFilePath := filepath.Join(configDir, subDirName, "config.yaml")
+	return configFilePath
 }
 
 func getConfigDir() (string, error) {

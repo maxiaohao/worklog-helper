@@ -12,23 +12,23 @@ import (
 type Method string
 
 const (
-	GET    Method = "GET"
-	POST   Method = "POST"
-	PUT    Method = "PUT"
-	PATCH  Method = "PATCH"
-	DELETE Method = "DELETE"
-	OPTION Method = "OPTION"
+	METHOD_GET    Method = "GET"
+	METHOD_POST   Method = "POST"
+	METHOD_PUT    Method = "PUT"
+	METHOD_PATCH  Method = "PATCH"
+	METHOD_DELETE Method = "DELETE"
+	METHOD_OPTION Method = "OPTION"
 )
 
-func SimpleExchange(method Method, apiUrl, authorization string, params map[string]string, reqBody any) ([]byte, error) {
+func SimpleExchange(method Method, apiUrl, authorization string, params map[string]string, reqBody any) (jsonBody string, er error) {
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	parsedUrl, err := url.Parse(apiUrl)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if len(params) > 0 {
@@ -41,7 +41,7 @@ func SimpleExchange(method Method, apiUrl, authorization string, params map[stri
 
 	req, err := http.NewRequest(string(method), parsedUrl.String(), bytes.NewBuffer(jsonData))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -50,27 +50,22 @@ func SimpleExchange(method Method, apiUrl, authorization string, params map[stri
 		req.Header.Set("Authorization", authorization)
 	}
 
-	// req.Header.Set("Content-Type", "application/json")
-	// auth := "username:password"
-	// token := base64.StdEncoding.EncodeToString([]byte(auth))
-	// req.Header.Set("Authorization", "Basic "+token)
-
 	client := &http.Client{}
 	response, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer response.Body.Close()
 
 	// Read the response body
 	respBodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if response.StatusCode >= 400 {
-		return respBodyBytes, fmt.Errorf("error: http response code: %v", response.StatusCode)
+		return string(respBodyBytes), fmt.Errorf("error: http response code: %v", response.StatusCode)
 	}
 
-	return respBodyBytes, nil
+	return string(respBodyBytes), nil
 }

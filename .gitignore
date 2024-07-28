@@ -12,4 +12,5 @@
 .vimrc
 .vscode/
 .~*
+__debug_*
 bin
