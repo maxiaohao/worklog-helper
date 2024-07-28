@@ -64,6 +64,7 @@ func SimpleExchange(method Method, apiUrl, authorization string, params map[stri
 	}
 
 	if response.StatusCode >= 400 {
+		// TODO: extract error messages for 4xx
 		return string(respBodyBytes), fmt.Errorf("http code: %v", response.StatusCode)
 	}
 

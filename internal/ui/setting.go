@@ -48,7 +48,7 @@ func NewSettingsPanel(w fyne.Window) fyne.CanvasObject {
 			{Text: "Email", Widget: email, HintText: "Your Atlassian Account Email"},
 			{Text: "Atlassian Url base", Widget: atlassianUrlBase, HintText: "Replace <your-organisation>"},
 			{Text: "Atlassian API token", Widget: atlassianApiToken, HintText: "Atlassian -> Manage Account -> Security -> Create and manage API tokens"},
-			{Text: "Tempo Url base", Widget: tempoUrlBase, HintText: "Default is https://api.tempo.io"},
+			{Text: "Tempo Url base", Widget: tempoUrlBase, HintText: "Default is https://api.tempo.io (other than 'us' and 'eu')"},
 			{Text: "Tempo API token", Widget: tempoApiToken, HintText: "Jira -> Apps -> Tempo -> Settings (left bar) -> API Integration -> New Token"},
 		},
 		SubmitText: "Verify & Save",

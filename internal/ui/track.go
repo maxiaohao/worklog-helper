@@ -115,22 +115,30 @@ func NewTrackTimeContainer(w fyne.Window) fyne.CanvasObject {
 			issueKeyInput.Enable()
 			verifyButton.Enable()
 
-			settings := data.Settings{}
-			err := yamlconfig.Read(&settings, CONFIG_SUB_DIR_NAME)
-			if err != nil && len(settings.AccountId) == 0 {
-				dialog.ShowError(fmt.Errorf("please initialise settings first"), w)
-				return
-			}
-			issue, err := getIssueByKey(strings.TrimSpace(issueKeyInput.Text), &settings)
-			if err != nil {
-				dialog.ShowError(err, w)
-				return
-			}
-			if err = createWorklog(issue.id, workNoteInput.Text, startTime, &settings); err != nil {
-				dialog.ShowError(err, w)
-			} else {
-				dialog.ShowInformation("Done", "A worklog has been sent to Tempo successfully!", w)
-			}
+			worklogStartTime := startTime
+			worklogIssueKey := strings.TrimSpace(issueKeyInput.Text)
+			worklogWorkNote := strings.TrimSpace(workNoteInput.Text)
+
+			go func() {
+				settings := data.Settings{}
+				yamlconfig.Read(&settings, CONFIG_SUB_DIR_NAME)
+				issue, err := getIssueByKey(worklogIssueKey, &settings)
+				if err != nil {
+					dialog.ShowError(err, w)
+					return
+				}
+				if err = createWorklog(issue.id, worklogWorkNote, worklogStartTime, &settings); err != nil {
+					dialog.ShowError(err, w)
+				} else {
+					successfulMessage := fmt.Sprintf(
+						"A worklog has been sent to Tempo successfully!\n\nissue: %v\nstartTime: %v\nduration: %v",
+						issue.key,
+						worklogStartTime.Format(time.RFC3339),
+						timefmt.ElapsedTime(worklogStartTime),
+					)
+					dialog.ShowInformation("Done", successfulMessage, w)
+				}
+			}()
 		}
 	}
 
@@ -194,21 +202,18 @@ func getIssueByKey(issueKey string, settings *data.Settings) (*Issue, error) {
 
 func createWorklog(issueId, workNote string, startTime time.Time, settings *data.Settings) error {
 	duration := time.Since(startTime)
-	if duration.Seconds() < 10 {
-		return fmt.Errorf("duration is too short (less than 10 seconds), no worklog has been sent")
+	if duration.Seconds() < 60 {
+		return fmt.Errorf("duration is too short (less than 1 minute), no worklog has been sent")
 	}
-
-	startDateLocal := startTime.Format("1999-12-31")
-	startTimeLocal := startTime.Format("23:12:34")
 
 	issueIdInt, _ := strconv.Atoi(issueId)
 	reqBody := map[string]any{
 		"authorAccountId":  settings.AccountId,
 		"issueId":          issueIdInt,
-		"startDate":        startDateLocal,
-		"startTime":        startTimeLocal,
-		"timeSpentSeconds": duration.Seconds(),
-		"billableSeconds":  duration.Seconds(),
+		"startDate":        startTime.Format(time.DateOnly),
+		"startTime":        startTime.Format(time.TimeOnly),
+		"timeSpentSeconds": int(duration.Seconds()),
+		"billableSeconds":  int(duration.Seconds()),
 		"description":      strings.TrimSpace(workNote),
 	}
 
