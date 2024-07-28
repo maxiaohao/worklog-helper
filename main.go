@@ -18,7 +18,8 @@ func main() {
 
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Track Time", ui.NewTrackTimeContainer(w)),
-		// TODO: container.NewTabItem("Worklog", ui.NewWorklogTable(w)),
+		// TODO: implement local pending worklogs
+		// container.NewTabItem("Worklog", ui.NewWorklogTable(w)),
 		container.NewTabItem("Settings", ui.NewSettingsPanel(w)),
 	)
 

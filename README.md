@@ -1,6 +1,6 @@
 # worklog-helper
 
-A small desktop program that helps track start/stop time of Jira worklogs into Tempo.
+A cross-platform small desktop program that helps track start/stop time of Jira worklogs into Tempo.
 
 ## Prerequisites
 
