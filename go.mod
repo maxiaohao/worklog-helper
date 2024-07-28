@@ -3,7 +3,6 @@ module worklog-helper
 go 1.22.2
 
 require (
-	fyne.io/fyne v1.4.3
 	fyne.io/fyne/v2 v2.5.0
 	gopkg.in/yaml.v3 v3.0.1
 )

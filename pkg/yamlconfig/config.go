@@ -2,6 +2,7 @@ package yamlconfig
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -9,25 +10,31 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func ReadConfig(subDirName string) (*any, error) {
+func Read(config *any, subDirName string) error {
 	configDir, err := getConfigDir()
 	if err != nil {
-		fmt.Printf("Error determining config directory: %v\n", err)
-		return nil, fmt.Errorf("TODO")
+		return err
 	}
 
 	configFilePath := filepath.Join(configDir, subDirName, "config.yaml")
 	file, err := os.Open(configFilePath)
 	if err != nil {
-		fmt.Printf("Error creating file: %v\n", err)
-		return nil, err
+		return err
 	}
 	defer file.Close()
 
-	return nil, nil // TODO:
+	yamlData, err := io.ReadAll(file)
+	if err != nil {
+		return err
+	}
+
+	if err := yaml.Unmarshal(yamlData, &config); err != nil {
+		return fmt.Errorf("failed to unmarshal YAML: %w", err)
+	}
+	return nil
 }
 
-func WriteConfig(subDirName string, config *any) {
+func Write(subDirName string, config *any) {
 	configDir, err := getConfigDir()
 	if err != nil {
 		fmt.Printf("Error determining config directory: %v\n", err)
@@ -36,7 +43,6 @@ func WriteConfig(subDirName string, config *any) {
 
 	configFilePath := filepath.Join(configDir, subDirName, "config.yaml")
 
-	// Create or open the YAML file
 	file, err := os.Create(configFilePath)
 	if err != nil {
 		fmt.Printf("Error creating file: %v\n", err)
