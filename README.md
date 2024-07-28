@@ -8,7 +8,6 @@ A small desktop program that helps track start/stop time of Jira worklogs into T
 
 ## Build and Install
 
-Build: `go build -o ./bin/worklog-helper main.go`
-Run: `./bin/worklog-helper`
-
-Alternatively, you can install the binary into your `GOPATH`: `go install`
+- Build: `go build -o ./bin/worklog-helper main.go`
+- Run: `./bin/worklog-helper`
+- Alternatively, you can install the binary into your `GOPATH`: `go install`
