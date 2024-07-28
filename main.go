@@ -18,7 +18,7 @@ func main() {
 
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Track Time", ui.NewTrackTimeContainer(w)),
-		container.NewTabItem("Worklog", ui.NewWorklogTable(w)),
+		// TODO: container.NewTabItem("Worklog", ui.NewWorklogTable(w)),
 		container.NewTabItem("Settings", ui.NewSettingsPanel(w)),
 	)
 

@@ -64,7 +64,7 @@ func SimpleExchange(method Method, apiUrl, authorization string, params map[stri
 	}
 
 	if response.StatusCode >= 400 {
-		return string(respBodyBytes), fmt.Errorf("error: http response code: %v", response.StatusCode)
+		return string(respBodyBytes), fmt.Errorf("http code: %v", response.StatusCode)
 	}
 
 	return string(respBodyBytes), nil

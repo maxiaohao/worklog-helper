@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"worklog-helper/internal/data"
 	"worklog-helper/pkg/rest"
 	"worklog-helper/pkg/yamlconfig"
@@ -29,7 +30,7 @@ func NewSettingsPanel(w fyne.Window) fyne.CanvasObject {
 	atlassianUrlBase.SetPlaceHolder("https://<your-organisation>.atlassian.net")
 	atlassianUrlBase.Validator = validation.NewRegexp(`^https?:\/\/[^\s/$.?#].[^\s]*$`, "not a valid http(s) url")
 
-	atlassianApiToken := widget.NewEntry()
+	atlassianApiToken := widget.NewPasswordEntry()
 	atlassianApiToken.SetPlaceHolder("Atlassian API token")
 
 	tempoUrlBase := widget.NewEntry()
@@ -37,7 +38,7 @@ func NewSettingsPanel(w fyne.Window) fyne.CanvasObject {
 	tempoUrlBase.SetPlaceHolder("https://api.tempo.io")
 	tempoUrlBase.Validator = validation.NewRegexp(`^https?:\/\/[^\s/$.?#].[^\s]*$`, "not a valid http(s) url")
 
-	tempoApiToken := widget.NewEntry()
+	tempoApiToken := widget.NewPasswordEntry()
 	tempoApiToken.SetPlaceHolder("Tempo API token")
 
 	accountIdLabel := widget.NewLabel("Atlassian Account Id: <To be verified>")
@@ -52,8 +53,12 @@ func NewSettingsPanel(w fyne.Window) fyne.CanvasObject {
 		},
 		SubmitText: "Verify & Save",
 		OnSubmit: func() {
-			atlassianAuthorizationValue := toBasicAuthorization(email.Text, atlassianApiToken.Text)
-			accountId, err := getAccountIdByEmail(email.Text, atlassianUrlBase.Text, atlassianAuthorizationValue)
+			atlassianAuthorizationValue := toBasicAuthorization(strings.TrimSpace(email.Text), strings.TrimSpace(atlassianApiToken.Text))
+			accountId, err := getAccountIdByEmail(
+				strings.TrimSpace(email.Text),
+				strings.TrimSpace(atlassianUrlBase.Text),
+				atlassianAuthorizationValue,
+			)
 			if err != nil {
 				dialog.ShowError(err, w)
 				return
@@ -63,16 +68,16 @@ func NewSettingsPanel(w fyne.Window) fyne.CanvasObject {
 			accountIdLabel.SetText(fmt.Sprintf("Atlassian Account Id: %v", accountId))
 
 			settings := data.Settings{
-				Email:     email.Text,
+				Email:     strings.TrimSpace(email.Text),
 				AccountId: accountId,
 				AtlassianSettings: data.ApiServerSettings{
-					UrlBase:            atlassianUrlBase.Text,
-					ApiToken:           atlassianApiToken.Text,
+					UrlBase:            strings.TrimSpace(atlassianUrlBase.Text),
+					ApiToken:           strings.TrimSpace(atlassianApiToken.Text),
 					AuthorizationValue: atlassianAuthorizationValue,
 				},
 				TempoSettings: data.ApiServerSettings{
-					UrlBase:            tempoUrlBase.Text,
-					ApiToken:           tempoApiToken.Text,
+					UrlBase:            strings.TrimSpace(tempoUrlBase.Text),
+					ApiToken:           strings.TrimSpace(tempoApiToken.Text),
 					AuthorizationValue: fmt.Sprintf("Bearer %v", tempoApiToken.Text),
 				},
 			}
