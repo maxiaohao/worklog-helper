@@ -131,7 +131,7 @@ func NewTrackTimeContainer(w fyne.Window) fyne.CanvasObject {
 					dialog.ShowError(err, w)
 				} else {
 					successfulMessage := fmt.Sprintf(
-						"A worklog has been sent to Tempo successfully!\n\nissue: %v\nstartTime: %v\nduration: %v",
+						"A worklog has been sent to Tempo successfully!\n\nJira: %v\nStart time: %v\n%v",
 						issue.key,
 						worklogStartTime.Format(time.RFC3339),
 						timefmt.ElapsedTime(worklogStartTime),

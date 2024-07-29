@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+// TODO: Remove sample data and use real pending worklogs.
 func NewWorklogTable(_ fyne.Window) fyne.CanvasObject {
 	t := widget.NewTableWithHeaders(
 		func() (int, int) { return 10, 4 },
